@@ -167,7 +167,6 @@ const TOOL_META = {
 const PAGE_META = {
   blog:        { path:"/blog",        title:"Conversion Guides & Tips | QuickUnits Blog",                    desc:"Practical guides on unit conversions, measurement systems, and everyday calculation tips." },
   advertising: { path:"/advertising", title:"Advertise on QuickUnits — Reach a Measurement-Focused Audience",desc:"Reach people actively converting measurements. Premium ad placements on QuickUnits." },
-  subscribe:   { path:"/subscribe",   title:"Subscribe to the QuickUnits Monthly Newsletter",                desc:"Monthly conversion tips, new tools and measurement guides straight to your inbox." },
   about:       { path:"/about",       title:"About QuickUnits — Free Unit Conversion Tools",                 desc:"QuickUnits is a free unit conversion toolkit built for everyday use. Fast, accurate and ad-supported." },
   privacy:     { path:"/privacy",     title:"Privacy Policy | QuickUnits",                                   desc:"QuickUnits privacy policy. How we collect, use and protect your data." },
 };
@@ -542,36 +541,6 @@ function AdvertisingPage() {
   );
 }
 
-function SubscribePage() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  return (
-    <div>
-      <div style={{ fontSize:11, color:BLUE, fontFamily:"DM Mono,monospace", letterSpacing:".08em", marginBottom:4, textTransform:"uppercase" }}>Subscribe</div>
-      <h1 style={{ fontSize:22, fontWeight:600, marginBottom:8 }}>Monthly Newsletter</h1>
-      <p style={{ fontSize:14, color:"#888", marginBottom:16 }}>Conversion tips, new tools and measurement guides — once a month.</p>
-      <div className="card" style={{ marginTop:16 }}>
-        {!submitted ? (
-          <>
-            <p style={{ fontSize:14, color:"#555", lineHeight:1.8, marginBottom:16 }}>We send out a monthly email with practical conversion guides, new tool announcements and measurement tips. No spam, no fluff, unsubscribe any time.</p>
-            <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-              <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)}
-                style={{ flex:1, minWidth:200, padding:"9px 12px" }} />
-              <button className="btn" onClick={() => email && setSubmitted(true)}>Subscribe</button>
-            </div>
-          </>
-        ) : (
-          <div style={{ textAlign:"center", padding:"20px 0" }}>
-            <div style={{ fontSize:24, marginBottom:8 }}>✅</div>
-            <div style={{ fontSize:15, fontWeight:600, color:"#1a1a1a", marginBottom:4 }}>You're subscribed!</div>
-            <div style={{ fontSize:13, color:"#888" }}>Thanks for signing up. First issue coming soon.</div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 function PrivacyPage() {
   const sections = [
     { title:"Overview", body:"This Privacy Policy explains how QuickUnits collects, uses and protects information when you visit quickunits.co.uk. By using the site you agree to the practices described in this policy." },
@@ -670,7 +639,6 @@ function BlogPage({ onNavigate }) {
 const FOOTER_LINKS = [
   { label:"Blog",           icon:"ti-pencil",       page:"blog" },
   { label:"Advertising",    icon:"ti-speakerphone",  page:"advertising" },
-  { label:"Subscribe",      icon:"ti-mail",          page:"subscribe" },
   { label:"About Us",       icon:"ti-info-circle",   page:"about" },
   { label:"Privacy Policy", icon:"ti-shield",        page:"privacy" },
 ];
@@ -808,7 +776,7 @@ export default function App() {
                 <div style={{ marginTop:24 }}>
                   {page==="blog"        && <BlogPage onNavigate={handleNav} />}
                   {page==="advertising" && <><AdvertisingPage /><BottomAdUnit /><SiteFooter onNavigate={handleNav} /></>}
-                  {page==="subscribe"   && <><SubscribePage /><BottomAdUnit /><SiteFooter onNavigate={handleNav} /></>}
+                  
                   {page==="about"       && <><AboutPage /><BottomAdUnit /><SiteFooter onNavigate={handleNav} /></>}
                   {page==="privacy"     && <><PrivacyPage /><BottomAdUnit /><SiteFooter onNavigate={handleNav} /></>}
                 </div>
