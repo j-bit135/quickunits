@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 // ── TOOLS ──────────────────────────────────────────────────────────────
 const TOOLS = [
@@ -169,6 +169,8 @@ const PAGE_META = {
   advertising: { path:"/advertising", title:"Advertise on QuickUnits — Reach a Measurement-Focused Audience",desc:"Reach people actively converting measurements. Premium ad placements on QuickUnits." },
   about:       { path:"/about",       title:"About QuickUnits — Free Unit Conversion Tools",                 desc:"QuickUnits is a free unit conversion toolkit built for everyday use. Fast, accurate and ad-supported." },
   privacy:     { path:"/privacy",     title:"Privacy Policy | QuickUnits",                                   desc:"QuickUnits privacy policy. How we collect, use and protect your data." },
+  contact:     { path:"/contact",     title:"Contact QuickUnits — Feedback, Suggestions & Partnerships",     desc:"Get in touch with QuickUnits for feedback, new converter suggestions, advertising or partnership enquiries." },
+  terms:       { path:"/terms",       title:"Terms of Service | QuickUnits",                                 desc:"QuickUnits terms of service. The terms that apply when using our free unit conversion tools." },
 };
 const SITE_DEFAULT = { title:"QuickUnits — Free Unit Conversion Tools", desc:"Free unit conversion tools for length, weight, temperature, volume, speed, data storage, cooking and more. Fast, accurate, instant." };
 
@@ -180,9 +182,28 @@ function useDocumentMeta(title, desc) {
     m.content = desc;
   }, [title, desc]);
 }
-function usePushState(path) {
+// ── ROUTING ────────────────────────────────────────────────────────────
+// Turns a URL path into app state, so direct visits (e.g. from Google),
+// refreshes and the browser back/forward buttons all land on the right page.
+function parsePath(pathname) {
+  const path = (pathname || "/").replace(/\/+$/, "") || "/";
+  const toolId = Object.keys(TOOL_META).find(id => TOOL_META[id].path === path);
+  if (toolId) return { tool: toolId, page: null, article: null };
+  const pageId = Object.keys(PAGE_META).find(id => PAGE_META[id].path === path);
+  if (pageId) return { tool: null, page: pageId, article: null };
+  const m = path.match(/^\/blog\/([^/]+)$/);
+  if (m && BLOG_POSTS.some(p => p.slug === m[1])) return { tool: null, page: "blog", article: m[1] };
+  return { tool: "length", page: null, article: null }; // "/" and unknown paths
+}
+
+function useSyncUrl(path) {
+  const first = useRef(true);
   useEffect(() => {
-    if (window.location.pathname !== path) window.history.pushState({}, '', path);
+    if (window.location.pathname === path) { first.current = false; return; }
+    // First render: replace rather than push, so "/" doesn't leave a dead history entry
+    if (first.current) window.history.replaceState({}, '', path);
+    else window.history.pushState({}, '', path);
+    first.current = false;
   }, [path]);
 }
 
@@ -605,10 +626,7 @@ const BLOG_POSTS = [
   { slug:"weight-measurement-guide", title:"Understanding Weight Measurements — kg, Pounds, Stone and More", category:"Weight", readTime:"4 min read", intro:"Weight is measured differently around the world, and the differences matter more than you might think. Here's a clear guide to all the main weight units and how to think about them.", body:`The kilogram (kg) is the SI base unit of mass and the standard used in science, medicine and most of the world for everyday weighing. The kilogram was originally defined as the mass of one litre of water at its maximum density. Since 2019 it has been redefined in terms of Planck's constant — a quantum mechanical constant — making it more precise and stable than any physical prototype could be.\n\nPounds (lb) are the primary weight unit in the United States and are still used alongside kilograms in the United Kingdom. One pound = 0.453592 kilograms. The abbreviation "lb" comes from the Latin word "libra" — the same root as the pound sterling (£) currency symbol, which also derives from a pound weight of silver.\n\nStone is a unit used almost exclusively in the UK and Ireland for measuring human body weight. One stone = 14 pounds = 6.35029 kilograms. The stone has no equivalent in other measurement systems and is one of the most confusing units for non-British people to interpret — someone who weighs 11 stone 4 pounds weighs 71.67 kilograms or 158 pounds.\n\nTons come in three varieties, which cause frequent confusion in international contexts. A metric tonne (t) = 1,000 kg. A US short ton = 2,000 pounds = 907.185 kg. A UK long ton = 2,240 pounds = 1,016.047 kg. When someone mentions "tons" without specifying, the context usually indicates which one — the UK tends to use metric tonnes now, while the US uses short tons, and long tons appear mostly in historical texts.` },
 ];
 
-function BlogPage({ onNavigate }) {
-  const [article, setArticle] = useState(null);
-
-  usePushState(article ? `/blog/${article}` : '/blog');
+function BlogPage({ article, setArticle, onNavigate }) {
   useEffect(() => {
     if (article) {
       const post = BLOG_POSTS.find(p => p.slug === article);
@@ -691,12 +709,28 @@ function SiteFooter({ onNavigate }) {
   );
 }
 
+// ── BRAND LOGO (links to the first tool) ──────────────────────────────
+function BrandLink({ onHome, children, style }) {
+  return (
+    <a href={TOOL_META.length.path} aria-label="QuickUnits — go to Length Converter"
+      onClick={e => {
+        // Let ctrl/cmd/middle-click open a new tab as normal
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        onHome();
+      }}
+      style={{ display:"flex", alignItems:"center", gap:10, textDecoration:"none", color:"inherit", cursor:"pointer", ...style }}>
+      {children}
+    </a>
+  );
+}
+
 // ── SIDEBAR ─────────────────────────────────────────────────────────────
 function SidebarContents({ activeTool, onSelectTool, onNavigate }) {
   return (
     <>
       <div style={{ padding:"16px 18px 8px", borderBottom:"1.5px solid #e0e4ed" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+        <BrandLink onHome={() => onSelectTool(TOOLS[0].id)}>
           <div style={{ width:30, height:30, background:BLUE, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
             <i className="ti ti-arrows-exchange" style={{ color:"#fff", fontSize:16 }} />
           </div>
@@ -704,7 +738,7 @@ function SidebarContents({ activeTool, onSelectTool, onNavigate }) {
             <div style={{ fontWeight:700, fontSize:14, letterSpacing:".02em", color:"#1a1a1a", fontFamily:"DM Mono,monospace" }}>QUICKUNITS</div>
             <div style={{ fontSize:9, color:"#aaa", letterSpacing:".1em", textTransform:"uppercase" }}>UNIT CONVERSION TOOLS</div>
           </div>
-        </div>
+        </BrandLink>
       </div>
       <div style={{ padding:"10px 0 6px" }}>
         <div style={{ fontSize:9, color:"#bbb", letterSpacing:".1em", textTransform:"uppercase", padding:"0 18px 6px", fontFamily:"DM Mono,monospace" }}>TOOLS</div>
@@ -730,27 +764,45 @@ function SidebarContents({ activeTool, onSelectTool, onNavigate }) {
 
 // ── APP ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [activeTool, setActiveTool] = useState("length");
+  const [initial] = useState(() => parsePath(window.location.pathname));
+  const [activeTool, setActiveTool] = useState(initial.tool || "length");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [page, setPage]             = useState(null);
+  const [page, setPage]             = useState(initial.page);
+  const [article, setArticle]       = useState(initial.article);
   const isMobile                    = useIsMobile();
 
-  const handleNav  = p => { setPage(p); setDrawerOpen(false); };
+  // Browser back/forward
+  useEffect(() => {
+    const onPop = () => {
+      const r = parsePath(window.location.pathname);
+      if (r.tool) setActiveTool(r.tool);
+      setPage(r.page);
+      setArticle(r.article);
+      setDrawerOpen(false);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  const handleNav  = p => { setPage(p); setArticle(null); setDrawerOpen(false); };
   const handleBack = () => setPage(null);
 
   const toolMeta = TOOL_META[activeTool] || {};
   const pageMeta = page ? PAGE_META[page] : null;
   const currentMeta = pageMeta || (page ? SITE_DEFAULT : toolMeta);
   useDocumentMeta(currentMeta.title || SITE_DEFAULT.title, currentMeta.desc || SITE_DEFAULT.desc);
-  usePushState(pageMeta ? pageMeta.path : (toolMeta.path || "/"));
+  const currentPath = page === "blog" && article ? `/blog/${article}`
+                    : pageMeta ? pageMeta.path
+                    : (toolMeta.path || "/");
+  useSyncUrl(currentPath);
 
   useEffect(() => {
     const el = document.querySelector('.main-scroll');
     if (el) el.scrollTop = 0;
     window.scrollTo(0, 0);
-  }, [page, activeTool]);
+  }, [page, activeTool, article]);
 
-  const handleSelectTool = t => { setActiveTool(t); setPage(null); setDrawerOpen(false); };
+  const handleSelectTool = t => { setActiveTool(t); setPage(null); setArticle(null); setDrawerOpen(false); };
 
   return (
     <>
@@ -767,7 +819,9 @@ export default function App() {
           <div className="drawer" onClick={e => { if(e.target === e.currentTarget) setDrawerOpen(false); }}>
             <div className="drawer-panel">
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 16px", borderBottom:"1.5px solid #e0e4ed" }}>
-                <span style={{ fontWeight:600, fontSize:13, fontFamily:"DM Mono,monospace" }}>QUICKUNITS</span>
+                <BrandLink onHome={() => handleSelectTool(TOOLS[0].id)}>
+                  <span style={{ fontWeight:600, fontSize:13, fontFamily:"DM Mono,monospace" }}>QUICKUNITS</span>
+                </BrandLink>
                 <button onClick={() => setDrawerOpen(false)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:20, color:"#888" }}>×</button>
               </div>
               <SidebarContents activeTool={activeTool} onSelectTool={handleSelectTool} onNavigate={handleNav} />
@@ -780,12 +834,12 @@ export default function App() {
         <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0 }}>
           {/* Mobile header */}
           <div className="mobile-header">
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <BrandLink onHome={() => handleSelectTool(TOOLS[0].id)}>
               <div style={{ width:28, height:28, background:BLUE, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center" }}>
                 <i className="ti ti-arrows-exchange" style={{ color:"#fff", fontSize:14 }} />
               </div>
               <span style={{ fontWeight:700, fontSize:14, fontFamily:"DM Mono,monospace", color:"#1a1a1a" }}>QUICKUNITS</span>
-            </div>
+            </BrandLink>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
               <button onClick={() => handleNav("blog")} style={{ background:"none", border:"none", cursor:"pointer", fontSize:13, color:"#555", fontFamily:"DM Sans" }}>blog</button>
               <button onClick={() => setDrawerOpen(true)}
@@ -801,7 +855,7 @@ export default function App() {
               <>
                 <InlineAdUnit />
                 <div style={{ marginTop:24 }}>
-                  {page==="blog"        && <BlogPage onNavigate={handleNav} />}
+                  {page==="blog"        && <BlogPage article={article} setArticle={setArticle} onNavigate={handleNav} />}
                   {page==="about"       && <><AboutPage /><BottomAdUnit /><SiteFooter onNavigate={handleNav} /></>}
                   {page==="privacy"     && <><PrivacyPage /><BottomAdUnit /><SiteFooter onNavigate={handleNav} /></>}
                   {page==="contact"     && <><QuickContactPage onBack={handleBack} /><BottomAdUnit /><SiteFooter onNavigate={handleNav} /></>}
