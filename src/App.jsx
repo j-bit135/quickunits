@@ -353,8 +353,6 @@ function AdSlot({ format, style }) {
   }, []);
   return (
     <div style={{ textAlign:"center", ...style }}>
-      <div style={{ fontSize:9, letterSpacing:".1em", color:"#b0b8cc", textTransform:"uppercase",
-        marginBottom:4, fontFamily:"DM Mono,monospace" }}>Advertisement</div>
       {/* Reserve the ad's space up front to avoid layout shift */}
       <div style={{ width:"100%", maxWidth:f.w, minHeight:f.h, margin:"0 auto", overflow:"hidden" }}>
         <ins className={f.cls} data-zoneid={f.zone}></ins>
