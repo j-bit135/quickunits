@@ -313,99 +313,74 @@ function CopyButton({ text }) {
 }
 
 // ── INLINE AD UNIT ─────────────────────────────────────────────────────
-function InlineAdUnit() {
-  const [hover, setHover] = useState(false);
-  const [mob, setMob] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768);
+// ── ADS ────────────────────────────────────────────────────────────────
+const AD_FORMATS = {
+  leaderboardDesktop: { cls:"eas6a97888e2",  zone:"6042854", w:728, h:90  },
+  mrecDesktop:        { cls:"eas6a97888e2",  zone:"6042856", w:300, h:250 },
+  mrecMobile:         { cls:"eas6a97888e10", zone:"6042862", w:300, h:250 },
+  bannerMobile:       { cls:"eas6a97888e10", zone:"6042864", w:300, h:50  },
+};
+const MOBILE_MAX      = 768;   // matches the CSS breakpoint (sidebar hides below this)
+const LEADERBOARD_MIN = 1110;  // 324px sidebar + 56px padding + 728px ad
+
+// Load the provider script once (script tags inside JSX don't execute)
+function loadAdProvider() {
+  if (document.getElementById("ad-provider-js")) return;
+  const sc = document.createElement("script");
+  sc.id = "ad-provider-js";
+  sc.async = true;
+  sc.type = "application/javascript";
+  sc.src = "https://a.magsrv.com/ad-provider.js";
+  document.head.appendChild(sc);
+}
+
+function useViewportWidth() {
+  const [w, setW] = useState(() => typeof window !== "undefined" ? window.innerWidth : 1280);
   useEffect(() => {
-    const fn = () => setMob(window.innerWidth <= 768);
-    window.addEventListener('resize', fn);
+    const fn = () => setW(window.innerWidth);
+    window.addEventListener("resize", fn);
     fn();
-    return () => window.removeEventListener('resize', fn);
+    return () => window.removeEventListener("resize", fn);
   }, []);
-  const h = mob ? 58 : 90;
-  const divH = mob ? 26 : 40;
+  return w;
+}
+
+function AdSlot({ format, style }) {
+  const f = AD_FORMATS[format];
+  useEffect(() => {
+    loadAdProvider();
+    (window.AdProvider = window.AdProvider || []).push({ serve: {} });
+  }, []);
   return (
-    <div onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
-      style={{ width:"100%", border:`1.5px solid ${hover?"#c7d7fc":"#e0e4ed"}`, borderRadius:6,
-        background:"#f7f8fa", overflow:"hidden", cursor:"pointer", transition:"border-color .2s", marginTop:8 }}>
+    <div style={{ textAlign:"center", ...style }}>
       <div style={{ fontSize:9, letterSpacing:".1em", color:"#b0b8cc", textTransform:"uppercase",
-        textAlign:"center", padding:"5px 0 0", fontFamily:"DM Mono,monospace" }}>Advertisement</div>
-      <div style={{ width:"100%", height:h, display:"flex", alignItems:"center", justifyContent:"center",
-        gap:mob?10:14, padding:`0 ${mob?14:24}px`, position:"relative" }}>
-        <div style={{ position:"absolute", top:0, left:0, right:0, height:1,
-          background:`linear-gradient(90deg,transparent,${BLUE} 40%,${BLUE} 60%,transparent)`,
-          opacity: hover ? .2 : .08, transition:"opacity .2s" }} />
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3, flexShrink:0 }}>
-          <span style={{ fontSize:mob?14:18, opacity:.3 }}>📢</span>
-          <span style={{ fontFamily:"DM Mono,monospace", fontSize:10, color:"#b0b8cc" }}>{mob?"320 × 50":"728 × 90"}</span>
-        </div>
-        <div style={{ width:1, height:divH, background:"#e0e4ed", flexShrink:0 }} />
-        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
-          <span style={{ fontFamily:"DM Mono,monospace", fontSize:mob?9:10, color:"#b0b8cc" }}>
-            {mob ? "Mobile banner — insert ad tag here" : "Leaderboard — insert ad tag here"}
-          </span>
-          <span style={{ fontFamily:"DM Mono,monospace", fontSize:9, color:"#c8d0de" }}>
-            Responsive · switches format by breakpoint
-          </span>
-        </div>
+        marginBottom:4, fontFamily:"DM Mono,monospace" }}>Advertisement</div>
+      {/* Reserve the ad's space up front to avoid layout shift */}
+      <div style={{ width:"100%", maxWidth:f.w, minHeight:f.h, margin:"0 auto", overflow:"hidden" }}>
+        <ins className={f.cls} data-zoneid={f.zone}></ins>
       </div>
     </div>
   );
 }
 
-function BottomAdUnit() {
-  const [hover, setHover] = useState(false);
-  const [mob, setMob] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768);
-  useEffect(() => {
-    const fn = () => setMob(window.innerWidth <= 768);
-    window.addEventListener('resize', fn);
-    fn();
-    return () => window.removeEventListener('resize', fn);
-  }, []);
-  const h = mob ? 58 : 90;
-  const divH = mob ? 26 : 40;
-  return (
-    <div onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
-      style={{ width:"100%", border:`1.5px solid ${hover?"#c7d7fc":"#e0e4ed"}`, borderRadius:6,
-        background:"#f7f8fa", overflow:"hidden", cursor:"pointer", transition:"border-color .2s", marginTop:32 }}>
-      <div style={{ fontSize:9, letterSpacing:".1em", color:"#b0b8cc", textTransform:"uppercase",
-        textAlign:"center", padding:"5px 0 0", fontFamily:"DM Mono,monospace" }}>Advertisement</div>
-      <div style={{ width:"100%", height:h, display:"flex", alignItems:"center", justifyContent:"center",
-        gap:mob?10:14, padding:`0 ${mob?14:24}px`, position:"relative" }}>
-        <div style={{ position:"absolute", top:0, left:0, right:0, height:1,
-          background:`linear-gradient(90deg,transparent,${BLUE} 40%,${BLUE} 60%,transparent)`,
-          opacity: hover ? .2 : .08, transition:"opacity .2s" }} />
-        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:3, flexShrink:0 }}>
-          <span style={{ fontSize:mob?14:18, opacity:.3 }}>📢</span>
-          <span style={{ fontFamily:"DM Mono,monospace", fontSize:10, color:"#b0b8cc" }}>{mob?"320 × 50":"728 × 90"}</span>
-        </div>
-        <div style={{ width:1, height:divH, background:"#e0e4ed", flexShrink:0 }} />
-        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
-          <span style={{ fontFamily:"DM Mono,monospace", fontSize:mob?9:10, color:"#b0b8cc" }}>
-            {mob ? "Mobile banner — insert ad tag here" : "Leaderboard — insert ad tag here"}
-          </span>
-          <span style={{ fontFamily:"DM Mono,monospace", fontSize:9, color:"#c8d0de" }}>
-            Responsive · switches format by breakpoint
-          </span>
-        </div>
-      </div>
-    </div>
-  );
+// Top/bottom banner: 728x90 when there's room, otherwise 300x50
+function BannerAd({ style }) {
+  const w = useViewportWidth();
+  const format = w >= LEADERBOARD_MIN ? "leaderboardDesktop" : "bannerMobile";
+  return <AdSlot key={format} format={format} style={style} />;
 }
 
-function SidebarAdUnit() {
-  const [hover, setHover] = useState(false);
+function InlineAdUnit() { return <BannerAd style={{ marginTop:8 }} />; }
+function BottomAdUnit() { return <BannerAd style={{ marginTop:32 }} />; }
+
+function SidebarAdUnit({ variant }) {
+  const w = useViewportWidth();
+  // Desktop sidebar is hidden on mobile, so don't render an ad slot into it there
+  if (variant === "desktop" && w <= MOBILE_MAX) return null;
+  const format = variant === "drawer" ? "mrecMobile" : "mrecDesktop";
   return (
     <div style={{ padding:"12px", borderTop:"1.5px solid #e0e4ed", marginTop:8 }}>
-      <div style={{ fontSize:9, letterSpacing:".1em", color:"#b0b8cc", textTransform:"uppercase", marginBottom:6, textAlign:"center", fontFamily:"DM Mono,monospace" }}>Advertisement</div>
-      <div onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
-        style={{ width:300, height:250, background:hover?"#eff6ff":"#f7f8fa", border:`1.5px dashed ${hover?"#2563eb":"#e0e4ed"}`, borderRadius:6, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all .2s", position:"relative", overflow:"hidden", margin:"0 auto" }}>
-        <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"#2563eb", opacity:hover?0.4:0.1, transition:"opacity .2s" }} />
-        <i className="ti ti-ad-2" style={{ fontSize:28, color:"#c8d0de", marginBottom:10 }} />
-        <div style={{ fontFamily:"DM Mono,monospace", fontSize:11, color:"#b0b8cc", letterSpacing:".06em", marginBottom:4 }}>300 × 250</div>
-        <div style={{ fontFamily:"DM Mono,monospace", fontSize:10, color:"#c8d0de" }}>AD PLACEMENT</div>
-        <div style={{ position:"absolute", bottom:8, fontSize:9, color:"#c8d0de", fontFamily:"DM Mono,monospace" }}>Insert ad tag here</div>
-      </div>
+      <AdSlot key={format} format={format} />
     </div>
   );
 }
@@ -726,7 +701,7 @@ function BrandLink({ onHome, children, style }) {
 }
 
 // ── SIDEBAR ─────────────────────────────────────────────────────────────
-function SidebarContents({ activeTool, onSelectTool, onNavigate }) {
+function SidebarContents({ activeTool, onSelectTool, onNavigate, variant = "desktop" }) {
   return (
     <>
       <div style={{ padding:"16px 18px 8px", borderBottom:"1.5px solid #e0e4ed" }}>
@@ -757,7 +732,7 @@ function SidebarContents({ activeTool, onSelectTool, onNavigate }) {
         <div style={{ fontSize:9, color:"#bbb", letterSpacing:".1em", textTransform:"uppercase", marginBottom:6, fontFamily:"DM Mono,monospace" }}>POWERED BY</div>
         <div style={{ fontFamily:"DM Mono,monospace", fontSize:11, color:"#aaa" }}>Pure JavaScript · No AI needed</div>
       </div>
-      <SidebarAdUnit />
+      <SidebarAdUnit variant={variant} />
     </>
   );
 }
@@ -824,7 +799,7 @@ export default function App() {
                 </BrandLink>
                 <button onClick={() => setDrawerOpen(false)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:20, color:"#888" }}>×</button>
               </div>
-              <SidebarContents activeTool={activeTool} onSelectTool={handleSelectTool} onNavigate={handleNav} />
+              <SidebarContents activeTool={activeTool} onSelectTool={handleSelectTool} onNavigate={handleNav} variant="drawer" />
             </div>
             <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />
           </div>
@@ -851,6 +826,7 @@ export default function App() {
 
           {/* Content area */}
           <div className="main-scroll" style={{ flex:1, overflowY:"auto", padding:"28px 28px 48px" }}>
+            <div key={currentPath}>{/* remounts content (and its ads) on each navigation */}
             {page ? (
               <>
                 <InlineAdUnit />
@@ -872,6 +848,7 @@ export default function App() {
                 </div>
               </>
             )}
+            </div>
           </div>
         </div>
       </div>
