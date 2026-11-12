@@ -403,113 +403,187 @@ function Link({ to, children, onClick, ...rest }) {
   );
 }
 
-// ── STYLES ─────────────────────────────────────────────────────────────
-// Fonts and icon CSS are loaded via <link> tags in index.html.
+// ── DESIGN: "Clean Studio" ─────────────────────────────────────────────
+// Fonts load via <link> in index.html. Icons are inline SVG (no icon font).
 const styles = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { -webkit-text-size-adjust: 100%; }
-  body, #root { background: #f7f8fa; color: #1a1a1a; font-family: 'DM Sans', sans-serif; }
-  a { color: inherit; }
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: #eee; }
-  ::-webkit-scrollbar-thumb { background: #ccc; }
+  body, #root { background: #f5f7fb; color: #0f172a; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
+  a { color: inherit; text-decoration: none; }
+  button, input, select { font-family: inherit; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  :focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; border-radius: 6px; }
 
-  input, select {
-    background: #fff; border: 1.5px solid #e0e4ed; border-radius: 6px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; color: #1a1a1a;
-    outline: none; transition: border-color .2s;
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  @media (max-width: 600px) { .wrap { padding: 0 16px; } }
+
+  /* Header */
+  .site-header { background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid #e6eaf2; position: sticky; top: 0; z-index: 50; }
+  .site-header-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; color: #0f172a; }
+  .brand-mark { width: 34px; height: 34px; border-radius: 9px; background: #2563eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .brand-name { font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+  .main-nav { display: flex; gap: 4px; flex-wrap: wrap; font-size: 14px; font-weight: 600; }
+  .main-nav a { padding: 10px 14px; border-radius: 10px; color: #334155; transition: background .15s, color .15s; }
+  .main-nav a:hover { background: #f1f5f9; color: #0f172a; }
+  .main-nav a.active { background: #e8efff; color: #1d4ed8; }
+  .main-nav a.cta { background: #0f172a; color: #fff; }
+  .main-nav a.cta:hover { background: #1e293b; }
+  /* Burger menu (narrow windows) */
+  .burger { display: none; width: 44px; height: 44px; border-radius: 10px; border: 1px solid #e6eaf2; background: #fff; cursor: pointer; align-items: center; justify-content: center; color: #0f172a; }
+  .burger:hover { border-color: #2563eb; color: #1d4ed8; }
+  .mobile-menu { display: none; border-top: 1px solid #eef1f6; background: #fff; max-height: calc(100vh - 68px); overflow-y: auto; }
+  .mobile-menu-inner { padding-top: 10px; padding-bottom: 18px; }
+  .mobile-menu .mm-main { display: flex; flex-direction: column; }
+  .mobile-menu .mm-main a { padding: 13px 4px; border-bottom: 1px solid #f1f4f8; font-size: 16px; font-weight: 600; color: #0f172a; }
+  .mobile-menu .mm-main a.active { color: #1d4ed8; }
+  .mobile-menu .mm-label { margin: 18px 4px 8px; }
+  .mobile-menu .mm-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .mobile-menu .mm-tools a { display: flex; align-items: center; gap: 8px; padding: 11px 12px; border-radius: 10px; background: #f8fafc; border: 1px solid #eef1f6; font-size: 14px; font-weight: 600; color: #334155; }
+  .mobile-menu .mm-tools a.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+  .mobile-menu .mm-cta { display: block; margin-top: 16px; text-align: center; padding: 13px; border-radius: 12px; background: #0f172a; color: #fff; font-weight: 700; font-size: 15px; }
+  @media (max-width: 900px) {
+    .main-nav, .tool-tabs { display: none; }
+    .burger { display: inline-flex; }
+    .site-header.open .mobile-menu { display: block; }
   }
-  input:focus, select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+  @media (max-width: 380px) { .mobile-menu .mm-tools { grid-template-columns: 1fr; } }
+  .tool-tabs { border-top: 1px solid #eef1f6; }
+  .tool-tabs nav { display: flex; gap: 4px; overflow-x: auto; white-space: nowrap; padding-top: 8px; padding-bottom: 8px; font-size: 13px; font-weight: 600; scrollbar-width: none; }
+  .tool-tabs nav::-webkit-scrollbar { display: none; }
+  .tool-tabs a { padding: 8px 12px; border-radius: 8px; color: #475569; transition: background .15s, color .15s; }
+  .tool-tabs a:hover { background: #f1f5f9; color: #0f172a; }
+  .tool-tabs a.active { background: #2563eb; color: #fff; }
 
-  .card { background: #fff; border: 1.5px solid #e0e4ed; border-radius: 8px; padding: 20px; margin-bottom: 14px; }
-  .card:hover { border-color: #bfcde8; }
-  a.card { display: block; text-decoration: none; color: inherit; }
+  /* Type */
+  .h1 { font-size: clamp(32px, 4vw, 44px); line-height: 1.08; letter-spacing: -0.03em; font-weight: 800; margin: 10px 0 6px; }
+  .h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+  .h2-lg { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .sub { font-size: 16px; color: #475569; line-height: 1.6; }
+  .body-p { font-size: 15px; color: #475569; line-height: 1.75; }
+  .eyebrow { font-size: 12px; font-weight: 700; color: #1d4ed8; text-transform: uppercase; letter-spacing: .06em; }
+  .label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .06em; }
 
-  .eyebrow { font-size: 11px; color: #2563eb; font-family: 'DM Mono', monospace; letter-spacing: .08em; margin-bottom: 4px; text-transform: uppercase; }
-  .h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
-  .h2 { font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 28px 0 12px; }
-  .lead { font-size: 14px; color: #666; line-height: 1.7; }
-  .body-p { font-size: 14px; color: #555; line-height: 1.8; }
-
-  .crumbs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #aaa; margin-bottom: 6px; list-style: none; }
-  .crumbs a { color: #2563eb; text-decoration: none; }
+  .crumbs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; font-weight: 600; color: #64748b; list-style: none; }
+  .crumbs a { color: #1d4ed8; }
   .crumbs a:hover { text-decoration: underline; }
-  .crumbs li + li::before { content: "/"; margin-right: 6px; color: #ccc; }
+  .crumbs li + li::before { content: "/"; margin-right: 6px; color: #cbd5e1; }
 
-  .btn-ghost {
-    background: transparent; border: 1.5px solid #e0e4ed; color: #666;
-    padding: 7px 14px; font-size: 12px; font-family: 'DM Sans'; border-radius: 6px; text-decoration: none;
-    cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
-  }
-  .btn-ghost:hover { border-color: #2563eb; color: #2563eb; }
+  /* Surfaces */
+  .panel { background: #fff; border: 1px solid #e6eaf2; border-radius: 18px; padding: 24px; }
+  .panel-lift { box-shadow: 0 24px 48px -32px rgba(15,23,42,.3); border-radius: 22px; }
+  a.panel { display: block; color: inherit; transition: border-color .15s, transform .15s, box-shadow .15s; }
+  a.panel:hover { border-color: #bfd0fb; transform: translateY(-2px); box-shadow: 0 12px 24px -18px rgba(15,23,42,.35); }
+  .section { margin-top: 40px; }
+  .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
 
-  .copy-btn {
-    background: #f0f4ff; border: 1.5px solid #c7d7fc; color: #2563eb;
-    padding: 5px 12px; font-size: 11px; font-family: 'DM Mono'; border-radius: 5px;
-    cursor: pointer; transition: all .15s; letter-spacing: .04em;
-  }
-  .copy-btn:hover { background: #2563eb; color: #fff; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px; background: #fff; border: 1px solid #e6eaf2; color: #334155; font-size: 14px; font-weight: 600; transition: all .15s; }
+  .pill:hover { border-color: #2563eb; color: #1d4ed8; }
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; }
 
-  .swap-btn { background: #f0f4ff; border: 1.5px solid #c7d7fc; border-radius: 8px; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; color: #2563eb; font-size: 16px; }
-  .swap-btn:hover { background: #2563eb; color: #fff; }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 10px; border: 1px solid #dbe2ec; background: #fff; color: #334155; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; }
+  .btn-ghost:hover { border-color: #2563eb; color: #1d4ed8; }
+  .copy-btn { padding: 7px 12px; border-radius: 8px; border: 1px solid #c7d7fc; background: #e8efff; color: #1d4ed8; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .15s; flex-shrink: 0; }
+  .copy-btn:hover { background: #2563eb; color: #fff; border-color: #2563eb; }
 
-  .result-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 14px; background: #f7f8fa; border: 1.5px solid #e0e4ed;
-    border-radius: 7px; margin-bottom: 8px; transition: border-color .15s;
-  }
-  .result-row:hover { border-color: #2563eb; background: #f0f4ff; }
-  .result-row.highlighted { border-color: #2563eb; background: #eff6ff; }
+  /* Converter */
+  .conv-row { display: flex; gap: 16px; align-items: stretch; flex-wrap: wrap; }
+  .conv-from { flex: 1 1 280px; background: #f8fafc; border: 1px solid #e6eaf2; border-radius: 16px; padding: 18px; }
+  .conv-to { flex: 1 1 280px; background: #2563eb; border-radius: 16px; padding: 18px; color: #fff; }
+  .conv-swap { display: flex; align-items: center; justify-content: center; }
+  .swap-btn { width: 48px; height: 48px; border-radius: 999px; border: 1px solid #dbe2ec; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; }
+  .swap-btn:hover { border-color: #2563eb; transform: rotate(180deg); }
+  .sel { margin-top: 8px; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #dbe2ec; background: #fff; font-size: 15px; font-weight: 600; color: #0f172a; outline: none; }
+  .sel:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+  .conv-to .sel { border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.12); color: #fff; }
+  .conv-to .sel option { color: #0f172a; }
+  .conv-to .label { color: #dbe6ff; }
+  .num-input { margin-top: 12px; width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid #2563eb; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 28px; color: #0f172a; background: #fff; outline: none; }
+  .num-input:focus { box-shadow: 0 0 0 4px rgba(37,99,235,.15); }
+  .result-out { display: block; margin-top: 12px; padding: 12px 0; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 28px; word-break: break-all; min-height: 58px; }
+  .formula { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; background: #f8fafc; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #334155; }
+  @media (max-width: 640px) { .conv-swap { width: 100%; } .num-input, .result-out { font-size: 24px; } }
 
-  .conv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .conv-table th, .conv-table td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #eef0f5; }
-  .conv-table th { font-size: 11px; color: #888; font-family: 'DM Mono', monospace; letter-spacing: .04em; text-transform: uppercase; font-weight: 500; }
-  .conv-table td.num { font-family: 'DM Mono', monospace; color: #1a1a1a; }
+  .all-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .all-card { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 16px; background: #fff; border: 1px solid #e6eaf2; border-radius: 14px; cursor: pointer; transition: border-color .15s; text-align: left; width: 100%; }
+  .all-card:hover { border-color: #93b4fb; }
+  .all-card.active { border-color: #2563eb; background: #f3f7ff; }
+
+  .conv-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .conv-table th { text-align: left; padding: 10px 0; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid #eef1f6; font-weight: 700; }
+  .conv-table td { padding: 11px 8px 11px 0; border-bottom: 1px solid #f1f4f8; font-family: 'JetBrains Mono', monospace; }
+  .conv-table td.eq { color: #1d4ed8; font-weight: 600; }
   .conv-table tr:last-child td { border-bottom: none; }
 
-  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: #f7f8fa; border: 1.5px solid #e0e4ed; border-radius: 6px; font-size: 12px; color: #555; text-decoration: none; transition: all .15s; }
-  .chip:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .split { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
 
-  .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-  .tool-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #fff; border: 1.5px solid #e0e4ed; border-radius: 8px; text-decoration: none; color: inherit; transition: all .15s; }
-  .tool-card:hover { border-color: #2563eb; background: #f7faff; }
-  .tool-card i { font-size: 20px; color: #2563eb; width: 36px; height: 36px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  /* Home */
+  .hero { padding: 64px 0 36px; text-align: center; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: #e8efff; color: #1d4ed8; font-size: 13px; font-weight: 700; }
+  .hero-h1 { margin: 20px auto 0; max-width: 820px; font-size: clamp(36px, 5.4vw, 60px); line-height: 1.05; letter-spacing: -0.035em; font-weight: 800; }
+  .hero-sub { margin: 20px auto 0; max-width: 640px; font-size: 18px; line-height: 1.6; color: #475569; }
+  .quick { margin: 36px auto 0; max-width: 860px; background: #fff; border: 1px solid #e6eaf2; border-radius: 20px; box-shadow: 0 20px 40px -24px rgba(15,23,42,.25); padding: 12px; display: flex; gap: 6px; flex-wrap: wrap; align-items: stretch; text-align: left; }
+  .quick-field { flex: 1 1 140px; padding: 8px 12px; border-radius: 12px; display: block; }
+  .quick-field + .quick-field { border-left: 1px solid #eef1f6; }
+  .quick-field select, .quick-field input { width: 100%; border: 0; outline: none; background: transparent; color: #0f172a; padding: 4px 0; }
+  .quick-field select { font-size: 15px; font-weight: 600; cursor: pointer; }
+  .quick-field input { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 600; }
+  .quick-result { flex: 1.2 1 180px; background: #2563eb; color: #fff; border-radius: 14px; padding: 12px 16px; }
+  .quick-result .label { color: #dbe6ff; }
+  .quick-result output { display: block; font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600; margin-top: 4px; word-break: break-all; }
+  @media (max-width: 700px) { .quick-field + .quick-field { border-left: 0; } .quick-field { background: #f8fafc; } }
 
-  .guide-link { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 11px 14px; background: #fff; border: 1.5px solid #e0e4ed; border-radius: 7px; margin-bottom: 8px; text-decoration: none; color: inherit; transition: border-color .15s; }
-  .guide-link:hover { border-color: #2563eb; }
+  .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .tool-card { display: flex; flex-direction: column; gap: 14px; padding: 22px; background: #fff; border: 1px solid #e6eaf2; border-radius: 18px; color: #0f172a; box-shadow: 0 1px 2px rgba(15,23,42,.04); transition: border-color .15s, transform .15s, box-shadow .15s; }
+  .tool-card:hover { border-color: #bfd0fb; transform: translateY(-2px); box-shadow: 0 14px 28px -20px rgba(15,23,42,.35); }
+  .icon-tile { width: 44px; height: 44px; border-radius: 12px; background: #e8efff; display: flex; align-items: center; justify-content: center; }
+  .guide-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 12px; }
+  .guide-row { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 18px 20px; background: #fff; border: 1px solid #e6eaf2; border-radius: 14px; color: #0f172a; transition: border-color .15s; }
+  .guide-row:hover { border-color: #93b4fb; }
+  .dark-band { background: #0f172a; color: #fff; border-radius: 22px; padding: 32px; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .dark-band a { padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,.1); color: #fff; font-size: 14px; font-weight: 600; transition: background .15s; }
+  .dark-band a:hover { background: rgba(255,255,255,.2); }
 
-  /* Sidebar */
-  .sidebar { width: 324px; background: #fff; border-right: 1.5px solid #e0e4ed; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; height: 100vh; position: sticky; top: 0; }
-  .sidebar-tool { display: flex; align-items: center; gap: 12px; padding: 11px 18px; cursor: pointer; border-left: 3px solid transparent; transition: all .15s; text-decoration: none; color: inherit; }
-  .sidebar-tool:hover { background: #f7f8fa; }
-  .sidebar-tool.active { background: #eff6ff; border-left-color: #2563eb; }
-  .sidebar-tool.active .tool-label { color: #2563eb; font-weight: 600; }
-  .tool-label { font-size: 13px; color: #1a1a1a; font-weight: 500; }
-  .tool-desc  { font-size: 11px; color: #888; margin-top: 1px; }
+  /* Articles */
+  .article-body p { font-size: 16px; color: #334155; line-height: 1.85; margin-bottom: 16px; white-space: pre-line; }
+  .article-intro { font-size: 17px; color: #0f172a; line-height: 1.8; margin-bottom: 20px; padding: 16px 18px; background: #f3f7ff; border-radius: 12px; }
 
-  /* Mobile header */
-  .mobile-header { display: none; background: #fff; border-bottom: 1.5px solid #e0e4ed; padding: 12px 16px; position: sticky; top: 0; z-index: 100; }
-
-  @media (max-width: 768px) {
-    .sidebar { display: none; }
-    .mobile-header { display: flex; align-items: center; justify-content: space-between; }
-    .main-scroll { padding: 16px !important; }
-    .ab-cols { grid-template-columns: 1fr !important; }
-    .drawer { position: fixed; inset: 0; z-index: 200; display: flex; }
-    .drawer-panel { width: min(92vw, 340px); height: 100%; background: #fff; border-right: 1.5px solid #e0e4ed; overflow-y: auto; display: flex; flex-direction: column; }
-    .drawer-backdrop { flex: 1; background: rgba(0,0,0,.3); }
-  }
-  @media (min-width: 769px) {
-    .drawer { display: none !important; }
-  }
+  /* Footer */
+  .site-footer { border-top: 1px solid #e6eaf2; background: #fff; margin-top: 56px; }
+  .site-footer-row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-top: 28px; padding-bottom: 28px; font-size: 13px; color: #64748b; }
+  .site-footer nav { display: flex; gap: 18px; flex-wrap: wrap; font-weight: 600; }
+  .site-footer nav a { color: #475569; }
+  .site-footer nav a:hover { color: #1d4ed8; }
 `;
 
-function CopyButton({ text }) {
+// Inline SVG icons (Tabler-style strokes)
+const ICON_PATHS = {
+  length:      "M4 17 17 4l3 3L7 20zM8 13l2 2M11 10l2 2M14 7l2 2",
+  weight:      "M6 8h12l2 12H4zM9 8a3 3 0 1 1 6 0",
+  temperature: "M10 14V5a2 2 0 1 1 4 0v9a4 4 0 1 1-4 0zM12 11v6",
+  area:        "M4 4h16v16H4zM4 9h5M15 20v-5",
+  volume:      "M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z",
+  speed:       "M4 17a8 8 0 1 1 16 0M12 17l4-5",
+  data:        "M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3",
+  cooking:     "M4 10h16v3a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6zM2 10h20M9 5v2M12 4v3M15 5v2",
+  currency:    "M5 9h14M5 15h14M10 4 8 20M16 4l-2 16",
+  time:        "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5l3 2",
+};
+function Icon({ d, size = 20, color = "currentColor", width = 1.9 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  );
+}
+const SWAP_PATH = "M7 10h14l-4 -4M17 14h-14l4 4";
+const TOTAL_UNITS = Object.values(CONVERSIONS).reduce((n, c) => n + c.units.length, 0);
+
+function CopyButton({ text, label = "Copy" }) {
   const [copied, setCopied] = useState(false);
   return (
-    <button className="copy-btn" onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1800); }}>
-      {copied ? "✓ copied" : "copy"}
+    <button type="button" className="copy-btn" onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1800); }}>
+      {copied ? "✓ Copied" : label}
     </button>
   );
 }
@@ -527,22 +601,20 @@ function Crumbs({ items }) {
   );
 }
 
-// Standard page header: breadcrumb, H1, optional sub-line
 function PageHeader({ crumbs, h1, sub }) {
   return (
-    <div style={{ marginBottom:16 }}>
+    <div style={{ marginBottom:8 }}>
       <Crumbs items={crumbs} />
       <h1 className="h1">{h1}</h1>
-      {sub && <p style={{ fontSize:13, color:"#888" }}>{sub}</p>}
+      {sub && <p className="sub">{sub}</p>}
     </div>
   );
 }
 
 // ── ADS ────────────────────────────────────────────────────────────────
 // All ad units removed for now (Nov 2026). Placement reference for later:
-//   • top banner    — above the page header on every page
+//   • top banner    — under the header, above the page content
 //   • bottom banner — above the site footer on every page
-//   • sidebar MPU   — bottom of the desktop sidebar / mobile drawer
 
 // ── CONVERTER TOOL ─────────────────────────────────────────────────────
 function ConverterTool({ toolId }) {
@@ -565,75 +637,56 @@ function ConverterTool({ toolId }) {
       <PageHeader crumbs={[{ name:"Home", path:"/" }, { name:meta.h1 }]} h1={meta.h1}
         sub={`Convert between ${conv.units.slice(0,4).map(u => u.label).join(", ")} and more`} />
 
-      {/* Main converter */}
-      <div className="card" style={{ marginTop:16 }}>
-        <div className="ab-cols" style={{ display:"grid", gridTemplateColumns:"1fr auto 1fr", gap:12, alignItems:"end", marginBottom:16 }}>
-          {/* From */}
-          <div>
-            <label htmlFor="qu-from" style={{ display:"block", fontSize:11, color:"#888", marginBottom:6, fontFamily:"DM Mono,monospace", letterSpacing:".04em" }}>FROM</label>
-            <select id="qu-from" value={fromUnit} onChange={e => setFromUnit(e.target.value)}
-              style={{ width:"100%", padding:"8px 10px", marginBottom:8 }}>
+      <section aria-label="Converter" className="panel panel-lift" style={{ marginTop:24 }}>
+        <div className="conv-row">
+          <div className="conv-from">
+            <label htmlFor="qu-from" className="label" style={{ display:"block" }}>From</label>
+            <select id="qu-from" className="sel" value={fromUnit} onChange={e => setFromUnit(e.target.value)}>
               {conv.units.map(u => <option key={u.id} value={u.id}>{u.label}</option>)}
             </select>
-            <input type={isBase ? "text" : "number"} inputMode={isBase ? "text" : "decimal"} aria-label={`Value in ${fromUnitObj?.label}`}
-              value={inputVal} onChange={e => setInputVal(e.target.value)} autoCapitalize="off" spellCheck={false}
-              style={{ width:"100%", padding:"10px 12px", fontSize:18, fontWeight:600, fontFamily:"DM Mono,monospace" }} />
+            <input className="num-input" type={isBase ? "text" : "number"} inputMode={isBase ? "text" : "decimal"} aria-label={`Value in ${fromUnitObj?.label}`}
+              value={inputVal} onChange={e => setInputVal(e.target.value)} autoCapitalize="off" spellCheck={false} />
           </div>
-
-          {/* Swap */}
-          <div style={{ paddingBottom:4 }}>
-            <button className="swap-btn" onClick={swap} aria-label="Swap units">⇄</button>
+          <div className="conv-swap">
+            <button type="button" className="swap-btn" onClick={swap} aria-label="Swap units"><Icon d={SWAP_PATH} color={BLUE} width={2} /></button>
           </div>
-
-          {/* To */}
-          <div>
-            <label htmlFor="qu-to" style={{ display:"block", fontSize:11, color:"#888", marginBottom:6, fontFamily:"DM Mono,monospace", letterSpacing:".04em" }}>TO</label>
-            <select id="qu-to" value={toUnit} onChange={e => setToUnit(e.target.value)}
-              style={{ width:"100%", padding:"8px 10px", marginBottom:8 }}>
+          <div className="conv-to">
+            <label htmlFor="qu-to" className="label" style={{ display:"block" }}>To</label>
+            <select id="qu-to" className="sel" value={toUnit} onChange={e => setToUnit(e.target.value)}>
               {conv.units.map(u => <option key={u.id} value={u.id}>{u.label}</option>)}
             </select>
-            <div aria-live="polite" style={{ background:"#eff6ff", border:"1.5px solid #c7d7fc", borderRadius:6, padding:"10px 12px", fontSize:18, fontWeight:600, fontFamily:"DM Mono,monospace", color:BLUE, minHeight:42 }}>
-              {result || "—"}
-            </div>
+            <output className="result-out" aria-live="polite">{result || "—"}</output>
           </div>
         </div>
-
-        {/* Formula */}
         {result && inputVal && (
-          <div style={{ background:"#f7f8fa", border:"1.5px solid #e0e4ed", borderRadius:6, padding:"10px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:8 }}>
-            <span style={{ fontFamily:"DM Mono,monospace", fontSize:13, color:"#555" }}>
-              {inputVal} {fromUnitObj?.label} = {result} {toUnitObj?.label}
-            </span>
+          <div className="formula">
+            <span>{inputVal} {fromUnitObj?.label} = {result} {toUnitObj?.label}</span>
             <CopyButton text={`${inputVal} ${fromUnitObj?.label} = ${result} ${toUnitObj?.label}`} />
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Convert to all */}
-      <div style={{ marginBottom:14 }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
-          <h2 style={{ fontSize:13, fontWeight:600, color:"#1a1a1a" }}>
-            {inputVal || "1"} {fromUnitObj?.label} in all units
-          </h2>
-          <button className="btn-ghost" onClick={() => setShowAll(!showAll)} style={{ fontSize:11 }}>
-            {showAll ? "Show less" : "Show all"}
-          </button>
+      <section className="section">
+        <div className="section-head" style={{ alignItems:"center" }}>
+          <h2 className="h2">{inputVal || "1"} {fromUnitObj?.label} in all units</h2>
+          <button type="button" className="btn-ghost" onClick={() => setShowAll(!showAll)}>{showAll ? "Show less" : "Show all"}</button>
         </div>
-        {conv.units.slice(0, showAll ? conv.units.length : 6).map(unit => {
-          if (unit.id === fromUnit) return null;
-          const val = convert(inputVal || "1", fromUnit, unit.id);
-          return (
-            <div key={unit.id} className={`result-row ${unit.id === toUnit ? "highlighted" : ""}`}
-              onClick={() => setToUnit(unit.id)} style={{ cursor:"pointer" }}>
-              <div>
-                <div style={{ fontFamily:"DM Mono,monospace", fontSize:14, fontWeight:600, color: unit.id === toUnit ? BLUE : "#1a1a1a" }}>{val || "—"}</div>
-                <div style={{ fontSize:11, color:"#888", marginTop:1 }}>{unit.label}</div>
+        <div className="all-grid">
+          {conv.units.filter(u => u.id !== fromUnit).slice(0, showAll ? undefined : 5).map(unit => {
+            const val = convert(inputVal || "1", fromUnit, unit.id);
+            return (
+              <div key={unit.id} role="button" tabIndex={0} className={`all-card ${unit.id === toUnit ? "active" : ""}`}
+                onClick={() => setToUnit(unit.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setToUnit(unit.id); } }}>
+                <div style={{ minWidth:0 }}>
+                  <div className="mono" style={{ fontWeight:600, fontSize:18, color: unit.id === toUnit ? "#1d4ed8" : "#0f172a", wordBreak:"break-all" }}>{val || "—"}</div>
+                  <div style={{ marginTop:4, fontSize:13, color:"#64748b" }}>{unit.label}</div>
+                </div>
+                {val && <CopyButton text={val} />}
               </div>
-              <CopyButton text={val} />
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }
@@ -645,97 +698,197 @@ function ToolInfo({ toolId }) {
   const label = u => conv.units.find(x => x.id === u)?.label || u;
   const noun = meta.h1.replace(/ Converter$/, "").toLowerCase();
   return (
-    <section>
-      <h2 className="h2">About the {meta.h1.toLowerCase()}</h2>
-      <div className="card"><p className="body-p">{meta.intro}</p></div>
-
-      <h2 className="h2">Common {noun} conversions</h2>
-      <div className="card" style={{ padding:"6px 8px", overflowX:"auto" }}>
-        <table className="conv-table">
-          <thead><tr><th>From</th><th>Equals</th></tr></thead>
-          <tbody>
-            {meta.common.map(([v, from, to], i) => (
-              <tr key={i}>
-                <td className="num">{v} {label(from)}</td>
-                <td className="num">{convertValue(toolId, v, from, to)} {label(to)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <>
+      <div className="split section">
+        <section className="panel" style={{ flex:"1 1 340px" }}>
+          <h2 className="h2" style={{ marginBottom:10 }}>About the {meta.h1.toLowerCase()}</h2>
+          <p className="body-p">{meta.intro}</p>
+        </section>
+        <section className="panel" style={{ flex:"1.4 1 420px", overflowX:"auto" }}>
+          <h2 className="h2" style={{ marginBottom:6 }}>Common {noun} conversions</h2>
+          <table className="conv-table">
+            <thead><tr><th>From</th><th>Equals</th></tr></thead>
+            <tbody>
+              {meta.common.map(([v, from, to], i) => (
+                <tr key={i}>
+                  <td>{v} {label(from)}</td>
+                  <td className="eq">{convertValue(toolId, v, from, to)} {label(to)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
       </div>
-
-      <h2 className="h2">Other converters</h2>
-      <div className="chips">
-        {TOOLS.filter(t => t.id !== toolId).map(t => (
-          <Link key={t.id} to={TOOL_META[t.id].path} className="chip"><i className={`ti ${t.icon}`} aria-hidden="true" />{TOOL_META[t.id].h1}</Link>
-        ))}
-      </div>
-    </section>
+      <section className="section">
+        <h2 className="h2" style={{ marginBottom:14 }}>Other converters</h2>
+        <div className="pills">
+          {TOOLS.filter(t => t.id !== toolId).map(t => (
+            <Link key={t.id} to={TOOL_META[t.id].path} className="pill"><Icon d={ICON_PATHS[t.id]} size={16} color={BLUE} />{TOOL_META[t.id].h1}</Link>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
 
 // ── HOME PAGE ──────────────────────────────────────────────────────────
+// Quick converter in the hero: pick a type, value and units
+function QuickConvert() {
+  const [toolId, setToolId] = useState("length");
+  const conv = CONVERSIONS[toolId];
+  const pick = id => {
+    const c = CONVERSIONS[id];
+    const defaults = { length:["mi","km"], weight:["kg","lb"], temperature:["c","f"], volume:["l","ukpt"], speed:["mph","kmh"], cooking:["cup","ml"], currency:["dec","hex"] };
+    const [f, t] = defaults[id] || [c.units[0].id, c.units[1].id];
+    return { f, t };
+  };
+  const [units, setUnits] = useState(() => pick("length"));
+  const [val, setVal] = useState(toolId === "currency" ? "255" : "1");
+  const result = convertValue(toolId, val, units.f, units.t);
+  const toLabel = conv.units.find(u => u.id === units.t)?.label || "";
+  const changeTool = id => { setToolId(id); setUnits(pick(id)); setVal(id === "currency" ? "255" : "1"); };
+  return (
+    <div className="quick">
+      <label className="quick-field">
+        <span className="label">Type</span>
+        <select value={toolId} onChange={e => changeTool(e.target.value)} aria-label="Conversion type">
+          {TOOLS.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+        </select>
+      </label>
+      <label className="quick-field">
+        <span className="label">Value</span>
+        <input type={toolId === "currency" ? "text" : "number"} inputMode={toolId === "currency" ? "text" : "decimal"} value={val} onChange={e => setVal(e.target.value)} aria-label="Value to convert" />
+      </label>
+      <label className="quick-field">
+        <span className="label">From</span>
+        <select value={units.f} onChange={e => setUnits({ ...units, f:e.target.value })} aria-label="From unit">
+          {conv.units.map(u => <option key={u.id} value={u.id}>{u.label}</option>)}
+        </select>
+      </label>
+      <label className="quick-field">
+        <span className="label">To</span>
+        <select value={units.t} onChange={e => setUnits({ ...units, t:e.target.value })} aria-label="To unit">
+          {conv.units.map(u => <option key={u.id} value={u.id}>{u.label}</option>)}
+        </select>
+      </label>
+      <div className="quick-result">
+        <span className="label">Result</span>
+        <output aria-live="polite">{result ? `${result} ${toLabel.replace(/^.*\((.*)\)$/, "$1")}` : "—"}</output>
+      </div>
+    </div>
+  );
+}
+
+const POPULAR = [
+  { label:"kg to lbs",   tool:"weight" },
+  { label:"°C to °F",    tool:"temperature" },
+  { label:"stone to kg", tool:"weight" },
+  { label:"mph to km/h", tool:"speed" },
+  { label:"cups to ml",  tool:"cooking" },
+  { label:"GB to MB",    tool:"data" },
+];
+
 function HomePage() {
   return (
     <div>
-      <div style={{ marginBottom:20 }}>
-        <div className="eyebrow">Free · Instant · No sign-up</div>
-        <h1 className="h1" style={{ fontSize:26 }}>{HOME_META.h1}</h1>
-        <p className="lead" style={{ maxWidth:640 }}>
+      <section className="hero">
+        <p className="badge">Free · Instant · No sign-up</p>
+        <h1 className="hero-h1">Free Online <span style={{ color:BLUE }}>Unit Converters</span></h1>
+        <p className="hero-sub">
           QuickUnits is a set of fast, accurate unit converters for everyday use. Pick a tool below to convert length, weight,
           temperature, volume and more. Every conversion runs instantly in your browser.
         </p>
-      </div>
+        <QuickConvert />
+        <div className="pills" style={{ justifyContent:"center", marginTop:20, alignItems:"center" }}>
+          <span style={{ color:"#64748b", fontSize:13, fontWeight:600, padding:"0 4px" }}>Popular:</span>
+          {POPULAR.map(p => <Link key={p.label} to={TOOL_META[p.tool].path} className="pill" style={{ fontSize:13, padding:"8px 12px" }}>{p.label}</Link>)}
+        </div>
+      </section>
 
-      <h2 className="h2">Conversion tools</h2>
-      <div className="tool-grid">
-        {TOOLS.map(t => (
-          <Link key={t.id} to={TOOL_META[t.id].path} className="tool-card">
-            <i className={`ti ${t.icon}`} aria-hidden="true" />
-            <span>
-              <span className="tool-label" style={{ display:"block" }}>{TOOL_META[t.id].h1}</span>
-              <span className="tool-desc" style={{ display:"block" }}>{t.desc}</span>
-            </span>
-          </Link>
-        ))}
-      </div>
+      <section id="tools" className="section">
+        <div className="section-head">
+          <div>
+            <h2 className="h2-lg">Conversion tools</h2>
+            <p className="sub" style={{ fontSize:15, marginTop:6 }}>{TOOLS.length} converters covering {TOTAL_UNITS} units of measurement.</p>
+          </div>
+        </div>
+        <div className="tool-grid">
+          {TOOLS.map(t => (
+            <Link key={t.id} to={TOOL_META[t.id].path} className="tool-card">
+              <span style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <span className="icon-tile"><Icon d={ICON_PATHS[t.id]} size={22} color={BLUE} /></span>
+                <span style={{ fontSize:12, fontWeight:700, color:"#64748b" }}>{CONVERSIONS[t.id].units.length} units</span>
+              </span>
+              <span>
+                <span style={{ display:"block", fontSize:17, fontWeight:700, letterSpacing:"-0.01em" }}>{TOOL_META[t.id].h1}</span>
+                <span style={{ display:"block", marginTop:4, fontSize:14, color:"#475569", lineHeight:1.5 }}>{t.desc}</span>
+              </span>
+              <span style={{ fontSize:13, fontWeight:700, color:"#1d4ed8" }}>Open converter →</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-      <h2 className="h2">Conversion guides</h2>
-      {BLOG_POSTS.map(p => (
-        <Link key={p.slug} to={`/blog/${p.slug}`} className="guide-link">
-          <span style={{ fontSize:13, fontWeight:500 }}>{p.title}</span>
-          <span style={{ fontSize:11, color:"#aaa", fontFamily:"DM Mono,monospace", whiteSpace:"nowrap" }}>{p.readTime}</span>
-        </Link>
-      ))}
-      <div style={{ marginTop:10 }}><Link to="/blog" className="btn-ghost">All guides →</Link></div>
+      <section className="section">
+        <div className="section-head">
+          <div>
+            <h2 className="h2-lg">Conversion guides</h2>
+            <p className="sub" style={{ fontSize:15, marginTop:6 }}>Plain-English explainers on measurement systems.</p>
+          </div>
+          <Link to="/blog" style={{ fontSize:14, fontWeight:700, color:"#1d4ed8" }}>All guides →</Link>
+        </div>
+        <div className="guide-grid">
+          {BLOG_POSTS.map(p => (
+            <Link key={p.slug} to={`/blog/${p.slug}`} className="guide-row">
+              <span>
+                <span className="eyebrow" style={{ display:"block" }}>{p.category}</span>
+                <span style={{ display:"block", marginTop:4, fontSize:15, fontWeight:600, lineHeight:1.4 }}>{p.title}</span>
+              </span>
+              <span style={{ flexShrink:0, fontSize:12, color:"#64748b", fontWeight:600 }}>{p.readTime.replace(" read", "")}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-      <h2 className="h2">Information</h2>
-      <div className="chips">
-        {INFO_LINKS.map(l => (
-          <Link key={l.to} to={l.to} className="chip"><i className={`ti ${l.icon}`} aria-hidden="true" />{l.label}</Link>
-        ))}
-      </div>
+      <section className="section">
+        <div className="dark-band">
+          <div style={{ maxWidth:560 }}>
+            <h2 style={{ fontSize:24, fontWeight:800, letterSpacing:"-0.02em" }}>Information</h2>
+            <p style={{ marginTop:8, color:"#cbd5e1", fontSize:15, lineHeight:1.6 }}>All conversions use exact international definitions and run in your browser. Nothing is stored or tracked.</p>
+          </div>
+          <nav aria-label="Information" style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+            {INFO_LINKS.map(l => <Link key={l.to} to={l.to}>{l.label}</Link>)}
+          </nav>
+        </div>
+      </section>
     </div>
   );
 }
 
 // ── INFO PAGES ─────────────────────────────────────────────────────────
 function NumberedCards({ sections }) {
-  return sections.map((sec, i) => (
-    <div key={i} className="card" style={{ marginTop:i===0?16:0 }}>
-      <h2 style={{ fontSize:13, fontWeight:600, color:BLUE, fontFamily:"DM Mono,monospace", letterSpacing:".04em", marginBottom:8, textTransform:"uppercase" }}>{String(i+1).padStart(2,"0")} — {sec.title}</h2>
-      {sec.body.split("\n\n").map((para, j, arr) => (
-        <p key={j} className="body-p" style={{ marginBottom: j < arr.length-1 ? 10 : 0 }}>{para}</p>
+  return (
+    <div style={{ display:"grid", gap:12, marginTop:24 }}>
+      {sections.map((sec, i) => (
+        <section key={i} className="panel">
+          <h2 style={{ display:"flex", alignItems:"center", gap:10, fontSize:17, fontWeight:700, marginBottom:10 }}>
+            <span className="mono" style={{ fontSize:12, fontWeight:600, color:"#1d4ed8", background:"#e8efff", borderRadius:8, padding:"4px 8px" }}>{String(i+1).padStart(2,"0")}</span>
+            {sec.title}
+          </h2>
+          {sec.body.split("\n\n").map((para, j, arr) => (
+            <p key={j} className="body-p" style={{ marginBottom: j < arr.length-1 ? 10 : 0 }}>{para}</p>
+          ))}
+        </section>
       ))}
     </div>
-  ));
+  );
 }
 
 function AboutPage() {
   return (
-    <div>
+    <div style={{ maxWidth:820 }}>
       <PageHeader crumbs={[{ name:"Home", path:"/" }, { name:"About" }]} h1={PAGE_META.about.h1} />
-      <div className="card" style={{ marginTop:16 }}>
+      <div className="panel" style={{ marginTop:24 }}>
         <p className="body-p" style={{ marginBottom:12 }}>QuickUnits is a free unit conversion toolkit built for everyday use. Whether you're cooking, travelling, coding or doing science homework, QuickUnits gives you fast, accurate conversions across ten categories of measurement.</p>
         <p className="body-p" style={{ marginBottom:12 }}>All conversions happen instantly in your browser — no server required, no data stored. We don't track your conversions and we never will.</p>
         <p className="body-p">QuickUnits is free to use. If you find it useful, sharing it with someone who needs it is the best way to support us.</p>
@@ -746,7 +899,7 @@ function AboutPage() {
 
 function ContactPage() {
   return (
-    <div>
+    <div style={{ maxWidth:820 }}>
       <PageHeader crumbs={[{ name:"Home", path:"/" }, { name:"Contact" }]} h1={PAGE_META.contact.h1}
         sub="We'd love to hear from you · contact.jwgroup@proton.me" />
       <NumberedCards sections={[
@@ -759,7 +912,7 @@ function ContactPage() {
 
 function TermsPage() {
   return (
-    <div>
+    <div style={{ maxWidth:820 }}>
       <PageHeader crumbs={[{ name:"Home", path:"/" }, { name:"Terms" }]} h1={PAGE_META.terms.h1} sub="Last updated: November 2026 · quickunits.co.uk" />
       <NumberedCards sections={[
         { title:"Acceptance of Terms", body:"By using QuickUnits (quickunits.co.uk) you agree to these Terms of Service. If you do not agree, please do not use our website." },
@@ -778,7 +931,7 @@ function TermsPage() {
 
 function PrivacyPage() {
   return (
-    <div>
+    <div style={{ maxWidth:820 }}>
       <PageHeader crumbs={[{ name:"Home", path:"/" }, { name:"Privacy" }]} h1={PAGE_META.privacy.h1} sub="Effective November 2026 · quickunits.co.uk" />
       <NumberedCards sections={[
         { title:"Overview", body:"This Privacy Policy explains how QuickUnits collects, uses and protects information when you visit quickunits.co.uk. By using the site you agree to the practices described in this policy." },
@@ -794,13 +947,13 @@ function PrivacyPage() {
 
 function NotFoundPage() {
   return (
-    <div>
-      <div className="eyebrow">404</div>
-      <h1 className="h1">Page not found</h1>
-      <p className="lead" style={{ marginBottom:20 }}>Sorry, we couldn't find that page. Try one of our converters instead.</p>
-      <div className="chips">
-        <Link to="/" className="chip"><i className="ti ti-home" aria-hidden="true" />Home</Link>
-        {TOOLS.map(t => <Link key={t.id} to={TOOL_META[t.id].path} className="chip">{TOOL_META[t.id].h1}</Link>)}
+    <div style={{ textAlign:"center", padding:"48px 0" }}>
+      <p className="badge">404</p>
+      <h1 className="h1" style={{ marginTop:16 }}>Page not found</h1>
+      <p className="sub" style={{ marginBottom:24 }}>Sorry, we couldn't find that page. Try one of our converters instead.</p>
+      <div className="pills" style={{ justifyContent:"center" }}>
+        <Link to="/" className="pill">Home</Link>
+        {TOOLS.map(t => <Link key={t.id} to={TOOL_META[t.id].path} className="pill">{TOOL_META[t.id].h1}</Link>)}
       </div>
     </div>
   );
@@ -811,16 +964,14 @@ function BlogPage({ article }) {
     const post = BLOG_POSTS.find(p => p.slug === article);
     if (!post) return null;
     return (
-      <article>
+      <article style={{ maxWidth:820 }}>
         <PageHeader crumbs={[{ name:"Home", path:"/" }, { name:"Blog", path:"/blog" }, { name:post.category }]} h1={post.title} />
-        <p style={{ fontSize:12, color:"#aaa", fontFamily:"DM Mono,monospace", marginTop:-10, marginBottom:16 }}>{post.readTime}</p>
-        <div className="card" style={{ marginTop:16 }}>
-          <p style={{ fontSize:15, color:"#444", lineHeight:1.85, marginBottom:16, fontStyle:"italic", borderLeft:`3px solid ${BLUE}`, paddingLeft:14 }}>{post.intro}</p>
-          {post.body.split("\n\n").map((para, i) => (
-            <p key={i} style={{ fontSize:14, color:"#555", lineHeight:1.85, marginBottom:14, whiteSpace:"pre-line" }}>{para}</p>
-          ))}
+        <p style={{ fontSize:13, color:"#64748b", fontWeight:600 }}>{post.category} · {post.readTime}</p>
+        <div className="panel article-body" style={{ marginTop:20 }}>
+          <p className="article-intro">{post.intro}</p>
+          {post.body.split("\n\n").map((para, i) => <p key={i}>{para}</p>)}
         </div>
-        <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+        <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginTop:16 }}>
           <Link to="/blog" className="btn-ghost">← All guides</Link>
           <Link to="/" className="btn-ghost">All converters</Link>
         </div>
@@ -832,16 +983,16 @@ function BlogPage({ article }) {
     <div>
       <PageHeader crumbs={[{ name:"Home", path:"/" }, { name:"Blog" }]} h1={PAGE_META.blog.h1}
         sub="Plain-English explainers on measurement systems and everyday conversions" />
-      <div style={{ marginTop:16 }}>
+      <div className="guide-grid" style={{ marginTop:24 }}>
         {BLOG_POSTS.map(post => (
-          <Link key={post.slug} to={`/blog/${post.slug}`} className="card" style={{ marginBottom:10 }}>
-            <div className="eyebrow" style={{ letterSpacing:".06em" }}>{post.category}</div>
-            <h2 style={{ fontSize:15, fontWeight:600, color:"#1a1a1a", marginBottom:6, lineHeight:1.35 }}>{post.title}</h2>
-            <p style={{ fontSize:13, color:"#666", lineHeight:1.65, marginBottom:10 }}>{post.intro}</p>
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-              <span style={{ fontSize:11, color:"#aaa", fontFamily:"DM Mono,monospace" }}>{post.readTime}</span>
-              <span style={{ fontSize:11, color:BLUE, fontFamily:"DM Mono,monospace" }}>Read article →</span>
-            </div>
+          <Link key={post.slug} to={`/blog/${post.slug}`} className="panel" style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            <span className="eyebrow">{post.category}</span>
+            <h2 style={{ fontSize:18, fontWeight:700, lineHeight:1.35, letterSpacing:"-0.01em" }}>{post.title}</h2>
+            <p style={{ fontSize:14, color:"#475569", lineHeight:1.65 }}>{post.intro}</p>
+            <span style={{ display:"flex", justifyContent:"space-between", marginTop:"auto", paddingTop:6, fontSize:13, fontWeight:600 }}>
+              <span style={{ color:"#64748b" }}>{post.readTime}</span>
+              <span style={{ color:"#1d4ed8" }}>Read article →</span>
+            </span>
           </Link>
         ))}
       </div>
@@ -849,81 +1000,90 @@ function BlogPage({ article }) {
   );
 }
 
-// ── SITE FOOTER ────────────────────────────────────────────────────────
+// ── SITE CHROME ────────────────────────────────────────────────────────
 const INFO_LINKS = [
-  { label:"About Us",         icon:"ti-info-circle",   to:"/about" },
-  { label:"Contact",          icon:"ti-speakerphone",  to:"/contact" },
-  { label:"Privacy Policy",   icon:"ti-shield",        to:"/privacy" },
-  { label:"Terms of Service", icon:"ti-file-text",     to:"/terms" },
+  { label:"About Us",         to:"/about" },
+  { label:"Contact",          to:"/contact" },
+  { label:"Privacy Policy",   to:"/privacy" },
+  { label:"Terms of Service", to:"/terms" },
 ];
 const FOOTER_LINKS = [
-  { label:"Home", icon:"ti-home",   to:"/" },
-  { label:"Blog", icon:"ti-pencil", to:"/blog" },
+  { label:"Home", to:"/" },
+  { label:"Blog", to:"/blog" },
   ...INFO_LINKS,
 ];
 
+function SiteHeader({ route, path }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => { setOpen(false); }, [path]);
+  // Close the burger menu with Escape
+  useEffect(() => {
+    if (!open) return;
+    const onKey = e => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+  const section = route.type === "home" || route.type === "tool" ? "tools"
+                : route.type === "article" || (route.type === "page" && route.id === "blog") ? "blog"
+                : route.type === "page" ? route.id : null;
+  return (
+    <header className={`site-header ${open ? "open" : ""}`}>
+      <div className="wrap site-header-row">
+        <Link to="/" className="brand" aria-label="QuickUnits home">
+          <span className="brand-mark"><Icon d={SWAP_PATH} color="#ffffff" width={2.2} /></span>
+          <span className="brand-name">QuickUnits</span>
+        </Link>
+        <button type="button" className="burger" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(o => !o)}>
+          <Icon d={open ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"} size={22} width={2} />
+        </button>
+        <nav aria-label="Main" className="main-nav">
+          <Link to="/" className={section === "tools" ? "active" : ""}>Converters</Link>
+          <Link to="/blog" className={section === "blog" ? "active" : ""}>Guides</Link>
+          <Link to="/about" className={section === "about" ? "active" : ""}>About</Link>
+          <Link to="/contact" className="cta">Contact</Link>
+        </nav>
+      </div>
+      {route.type !== "home" && (
+        <div className="tool-tabs">
+          <nav aria-label="Converters" className="wrap">
+            {TOOLS.map(t => (
+              <Link key={t.id} to={TOOL_META[t.id].path} className={route.type === "tool" && route.id === t.id ? "active" : ""}>{t.label}</Link>
+            ))}
+          </nav>
+        </div>
+      )}
+      <div id="mobile-menu" className="mobile-menu">
+        <div className="wrap mobile-menu-inner">
+          <nav aria-label="Menu" className="mm-main">
+            <Link to="/" className={section === "tools" ? "active" : ""}>Converters</Link>
+            <Link to="/blog" className={section === "blog" ? "active" : ""}>Guides</Link>
+            <Link to="/about" className={section === "about" ? "active" : ""}>About</Link>
+          </nav>
+          <div className="label mm-label">Tools</div>
+          <nav aria-label="All converters" className="mm-tools">
+            {TOOLS.map(t => (
+              <Link key={t.id} to={TOOL_META[t.id].path} className={route.type === "tool" && route.id === t.id ? "active" : ""}>
+                <Icon d={ICON_PATHS[t.id]} size={16} color={route.type === "tool" && route.id === t.id ? "#ffffff" : BLUE} />{t.label}
+              </Link>
+            ))}
+          </nav>
+          <Link to="/contact" className="mm-cta">Contact</Link>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 function SiteFooter() {
   return (
-    <footer style={{ marginTop:40, paddingTop:24, borderTop:"1.5px solid #e0e4ed" }}>
-      <nav aria-label="Footer" className="chips" style={{ justifyContent:"center", marginBottom:16 }}>
-        {FOOTER_LINKS.map(l => (
-          <Link key={l.to} to={l.to} className="chip"><i className={`ti ${l.icon}`} aria-hidden="true" />{l.label}</Link>
-        ))}
-      </nav>
-      <div style={{ textAlign:"center", fontSize:11, color:"#999", fontFamily:"DM Mono,monospace" }}>
-        © 2026 QUICKUNITS · quickunits.co.uk
+    <footer className="site-footer">
+      <div className="wrap site-footer-row">
+        <span style={{ fontWeight:600 }}>© 2026 QuickUnits · quickunits.co.uk <span className="mono" style={{ fontWeight:500, color:"#94a3b8", marginLeft:8 }}>Pure JavaScript · No AI needed</span></span>
+        <nav aria-label="Footer">
+          {FOOTER_LINKS.map(l => <Link key={l.to} to={l.to}>{l.label}</Link>)}
+        </nav>
       </div>
     </footer>
-  );
-}
-
-// ── BRAND LOGO (links to the homepage) ────────────────────────────────
-function BrandLink({ children, style }) {
-  return (
-    <Link to="/" aria-label="QuickUnits home"
-      style={{ display:"flex", alignItems:"center", gap:10, textDecoration:"none", color:"inherit", cursor:"pointer", ...style }}>
-      {children}
-    </Link>
-  );
-}
-
-// ── SIDEBAR ─────────────────────────────────────────────────────────────
-function SidebarContents({ activeTool, isHome }) {
-  return (
-    <>
-      <div style={{ padding:"16px 18px 8px", borderBottom:"1.5px solid #e0e4ed" }}>
-        <BrandLink>
-          <div style={{ width:30, height:30, background:BLUE, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <i className="ti ti-arrows-exchange" style={{ color:"#fff", fontSize:16 }} aria-hidden="true" />
-          </div>
-          <div>
-            <div style={{ fontWeight:700, fontSize:14, letterSpacing:".02em", color:"#1a1a1a", fontFamily:"DM Mono,monospace" }}>QUICKUNITS</div>
-            <div style={{ fontSize:9, color:"#aaa", letterSpacing:".1em", textTransform:"uppercase" }}>UNIT CONVERSION TOOLS</div>
-          </div>
-        </BrandLink>
-      </div>
-      <nav aria-label="Converters" style={{ padding:"10px 0 6px" }}>
-        <Link to="/" className={`sidebar-tool ${isHome ? "active" : ""}`}>
-          <i className="ti ti-home" style={{ fontSize:16, color: isHome ? BLUE : "#888", flexShrink:0 }} aria-hidden="true" />
-          <div><div className="tool-label">Home</div><div className="tool-desc">All tools, guides & info</div></div>
-        </Link>
-        <div style={{ fontSize:9, color:"#bbb", letterSpacing:".1em", textTransform:"uppercase", padding:"10px 18px 6px", fontFamily:"DM Mono,monospace" }}>TOOLS</div>
-        {TOOLS.map(tool => (
-          <Link key={tool.id} to={TOOL_META[tool.id].path} className={`sidebar-tool ${activeTool === tool.id ? "active" : ""}`}>
-            <i className={`ti ${tool.icon}`} style={{ fontSize:16, color: activeTool === tool.id ? BLUE : "#888", flexShrink:0 }} aria-hidden="true" />
-            <div>
-              <div className="tool-label">{tool.label}</div>
-              <div className="tool-desc">{tool.desc}</div>
-            </div>
-          </Link>
-        ))}
-      </nav>
-      <div style={{ padding:"8px 18px 6px", marginTop:8 }}>
-        <div style={{ fontSize:9, color:"#bbb", letterSpacing:".1em", textTransform:"uppercase", marginBottom:6, fontFamily:"DM Mono,monospace" }}>POWERED BY</div>
-        <div style={{ fontFamily:"DM Mono,monospace", fontSize:11, color:"#aaa" }}>Pure JavaScript · No AI needed</div>
-      </div>
-      {/* Sidebar ad slot removed for now */}
-    </>
   );
 }
 
@@ -931,33 +1091,26 @@ function SidebarContents({ activeTool, isHome }) {
 // `url` is passed when pre-rendering at build time; in the browser it's read from location.
 export default function App({ url }) {
   const [path, setPath] = useState(() => normalisePath(url ?? window.location.pathname));
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const route = parsePath(path);
 
   const navigate = useCallback(to => {
     const p = normalisePath(to);
     if (p !== normalisePath(window.location.pathname)) window.history.pushState({}, "", p);
     setPath(p);
-    setDrawerOpen(false);
+    // Drop focus from the tapped link so it doesn't keep a focus ring on the new page
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   }, []);
 
   // Browser back/forward
   useEffect(() => {
-    const onPop = () => { setPath(normalisePath(window.location.pathname)); setDrawerOpen(false); };
+    const onPop = () => setPath(normalisePath(window.location.pathname));
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   useDocumentMeta(getMeta(path));
 
-  useEffect(() => {
-    const el = document.querySelector(".main-scroll");
-    if (el) el.scrollTop = 0;
-    window.scrollTo(0, 0);
-  }, [path]);
-
-  const activeTool = route.type === "tool" ? route.id : null;
-  const isHome = route.type === "home";
+  useEffect(() => { window.scrollTo(0, 0); }, [path]);
 
   let content;
   if (route.type === "home")         content = <HomePage />;
@@ -975,55 +1128,14 @@ export default function App({ url }) {
   return (
     <NavContext.Provider value={navigate}>
       <style>{styles}</style>
-      <div style={{ display:"flex", minHeight:"100vh", background:"#f7f8fa" }}>
-
-        {/* Desktop sidebar */}
-        <aside className="sidebar">
-          <SidebarContents activeTool={activeTool} isHome={isHome} />
-        </aside>
-
-        {/* Mobile drawer */}
-        {drawerOpen && (
-          <div className="drawer" onClick={e => { if (e.target === e.currentTarget) setDrawerOpen(false); }}>
-            <div className="drawer-panel">
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"flex-end", padding:"8px 12px 0" }}>
-                <button onClick={() => setDrawerOpen(false)} aria-label="Close menu" style={{ background:"none", border:"none", cursor:"pointer", fontSize:22, color:"#888" }}>×</button>
-              </div>
-              <SidebarContents activeTool={activeTool} isHome={isHome} />
-            </div>
-            <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />
-          </div>
-        )}
-
-        {/* Main content */}
-        <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0 }}>
-          {/* Mobile header */}
-          <header className="mobile-header">
-            <BrandLink>
-              <div style={{ width:28, height:28, background:BLUE, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <i className="ti ti-arrows-exchange" style={{ color:"#fff", fontSize:14 }} aria-hidden="true" />
-              </div>
-              <span style={{ fontWeight:700, fontSize:14, fontFamily:"DM Mono,monospace", color:"#1a1a1a" }}>QUICKUNITS</span>
-            </BrandLink>
-            <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-              <Link to="/blog" style={{ fontSize:13, color:"#555", textDecoration:"none" }}>Blog</Link>
-              <button onClick={() => setDrawerOpen(true)}
-                style={{ background:BLUE, color:"#fff", border:"none", borderRadius:6, padding:"7px 14px", fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"DM Sans" }}>
-                Tools
-              </button>
-            </div>
-          </header>
-
-          {/* Content area */}
-          <main className="main-scroll" style={{ flex:1, overflowY:"auto", padding:"28px 28px 48px" }}>
-            <div key={path}>
-              {/* Top ad slot removed for now */}
-              {content}
-              {/* Bottom ad slot removed for now */}
-              <SiteFooter />
-            </div>
-          </main>
-        </div>
+      <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", background:"#f5f7fb" }}>
+        <SiteHeader route={route} path={path} />
+        <main key={path} className="wrap" style={{ flex:1, width:"100%", paddingTop: route.type === "home" ? 0 : 32, paddingBottom:24 }}>
+          {/* Top ad slot removed for now */}
+          {content}
+          {/* Bottom ad slot removed for now */}
+        </main>
+        <SiteFooter />
       </div>
     </NavContext.Provider>
   );
